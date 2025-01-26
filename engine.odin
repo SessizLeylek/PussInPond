@@ -4,6 +4,7 @@ import rl "vendor:raylib"
 
 // DEFINE YOUR RESOURCES HERE
 tex_sprites : rl.Texture2D
+tex_title : rl.Texture2D
 snd_bubble : rl.Sound
 snd_pop : rl.Sound
 snd_eat : rl.Sound
@@ -14,6 +15,9 @@ load_resources :: proc()
 {
     raw_image1 := #load("sprites.png")
     tex_sprites = rl.LoadTextureFromImage(rl.LoadImageFromMemory(".png", &raw_image1[0], i32(len(raw_image1))))
+
+    raw_image2 := #load("title.png")
+    tex_title = rl.LoadTextureFromImage(rl.LoadImageFromMemory(".png", &raw_image2[0], i32(len(raw_image2))))
 
     raw_bubble := #load("bubble.ogg")
     snd_bubble = rl.LoadSoundFromWave(rl.LoadWaveFromMemory(".ogg", &raw_bubble[0], i32(len(raw_bubble))))

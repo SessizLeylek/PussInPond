@@ -354,6 +354,15 @@ main :: proc()
     init_window()
     update_rel_pos()
 
+    for true
+    {
+        if rl.GetKeyPressed() != .KEY_NULL do break
+
+        rl.BeginDrawing()
+        rl.DrawTextureEx(tex_title, 0, 0, 4, rl.WHITE)
+        rl.EndDrawing()
+    }
+
     restart_game()
 
     for !rl.WindowShouldClose()
