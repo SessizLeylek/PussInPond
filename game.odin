@@ -24,7 +24,9 @@ fish_spawn_cooldown : f32
 Player :: struct{
     pos, velocity : rl.Vector2,
     dir : i8,
-    in_bubble : bool
+    in_bubble : bool,
+    dash_cooldown : f32,
+    dash_dir : rl.Vector2
 }
 player : Player
 PLAYER_SPEED :: 256
@@ -123,9 +125,31 @@ update_game :: proc()
         {
             player.velocity += {0, rl.GetFrameTime() * PLAYER_SPEED}
         }
+
+        // dashing
+        if rl.IsKeyPressed(.LEFT_SHIFT) && player.dash_cooldown == 0
+        {
+            player.dash_cooldown = 3
+            player.dash_dir = 0
+            if rl.IsKeyDown(.RIGHT) do player.dash_dir.x = 1
+            else if rl.IsKeyDown(.LEFT) do player.dash_dir.x = -1
+            if rl.IsKeyDown(.UP) do player.dash_dir.y = -1
+            else if rl.IsKeyDown(.DOWN) do player.dash_dir.y = 1
+
+            player.dash_dir = rl.Vector2Normalize(player.dash_dir)
+            player.velocity = 0
+        }
     }
 
     // player movement
+    player.dash_cooldown -= rl.GetFrameTime()
+    if player.dash_cooldown < 0 do player.dash_cooldown = 0
+    if player.dash_cooldown > 2.8
+    {
+        // dashing
+        player.pos += player.dash_dir * PLAYER_SPEED * rl.GetFrameTime() * 4
+    }
+
     player.pos += player.velocity * rl.GetFrameTime()
     if player.pos.x > 960 do player.pos.x = 960
     else if player.pos.x < 0 do player.pos.x = 0
@@ -305,8 +329,16 @@ draw_game :: proc()
         }
     }
 
-    if game_active do draw_from_cropped_sprite(drawn_sprite, player.pos, 4, 0, rl.WHITE)
-    else do draw_from_cropped_sprite(SPR_CATR1, player.pos, 4, 180, rl.WHITE)
+    cat_color := rl.WHITE
+    if !player.in_bubble 
+    {
+        cat_color = rl.Color {255, 106, 0, 255}
+        if player.dash_cooldown > 2.8 do cat_color = rl.LIGHTGRAY
+        else if player.dash_cooldown > 0 do cat_color = rl.RED
+    }
+
+    if game_active do draw_from_cropped_sprite(drawn_sprite, player.pos, 4, 0, cat_color)
+    else do draw_from_cropped_sprite(SPR_CATR1, player.pos, 4, 180, cat_color)
 
     // Draw fishes
     for fish in fishes
