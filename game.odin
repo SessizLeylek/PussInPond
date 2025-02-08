@@ -56,6 +56,7 @@ restart_game :: proc()
     player.pos = {480, 480}
     player.velocity = 0
     player.in_bubble = false
+    player.dash_cooldown = 0
     oxygen_level = 100
     hunger_level = 100
     score = 0
@@ -386,6 +387,7 @@ main :: proc()
     init_window()
     update_rel_pos()
 
+    // title screen
     for true
     {
         if rl.GetKeyPressed() != .KEY_NULL do break
@@ -397,6 +399,7 @@ main :: proc()
 
     restart_game()
 
+    // game
     for !rl.WindowShouldClose()
     {
         if game_active do update_game()
